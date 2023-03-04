@@ -26,6 +26,10 @@ target_link_libraries(${APP_NAME} LINK_PUBLIC
     pico_stdlib
     FreeRTOS)
 
+target_link_options(${APP_NAME} PRIVATE
+    -Xlinker --print-memory-usage
+)
+
 # Enable/disable STDIO via USB and UART
 pico_enable_stdio_usb(${APP_NAME} 1)
 pico_enable_stdio_uart(${APP_NAME} 1)
