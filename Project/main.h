@@ -23,6 +23,7 @@
 // Pico SDK
 #include "pico/stdlib.h"            // Includes `hardware_gpio.h`
 #include "pico/binary_info.h"
+#include "pico/multicore.h"
 
 
 #ifdef __cplusplus

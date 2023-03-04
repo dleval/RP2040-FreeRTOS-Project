@@ -22,6 +22,27 @@ const TickType_t ms_delay = 500 / portTICK_PERIOD_MS;
 TaskHandle_t gpio_task_handle = NULL;
 TaskHandle_t pico_task_handle = NULL;
 
+/*
+ * MULTICORE FUNCTIONS
+ */
+
+
+void core1_entry() {
+    while (1) {
+        // Function pointer is passed to us via the FIFO
+        // We have one incoming int32_t as a parameter, and will provide an
+        // int32_t return value by simply pushing it back on the FIFO
+        // which also indicates the result is ready.
+        int32_t (*func)() = (int32_t(*)()) multicore_fifo_pop_blocking();
+        int32_t p = multicore_fifo_pop_blocking();
+        int32_t result = (*func)(p);
+        multicore_fifo_push_blocking(result);
+    }
+}
+
+int32_t mutiply_by_two(int32_t n) {
+    return n * 2;
+}
 
 /*
  * FUNCTIONS
@@ -33,26 +54,33 @@ TaskHandle_t pico_task_handle = NULL;
 void led_task_pico(void* unused_arg) {
     // Store the Pico LED state
     uint8_t pico_led_state = 0;
+    int32_t ms_delay_led;
     
     // Configure the Pico's on-board LED
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     
     while (true) {
+        ms_delay_led = ms_delay;
+        multicore_fifo_push_blocking((uintptr_t) &mutiply_by_two);
+        multicore_fifo_push_blocking(ms_delay);
+
         // Turn Pico LED on an add the LED state
         // to the FreeRTOS xQUEUE
         log_debug("PICO LED FLASH");
         pico_led_state = 1;
         gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
         xQueueSendToBack(queue, &pico_led_state, 0);
-        vTaskDelay(ms_delay);
+        vTaskDelay(ms_delay_led);
+
+        ms_delay_led = multicore_fifo_pop_blocking();
         
         // Turn Pico LED off an add the LED state
         // to the FreeRTOS xQUEUE
         pico_led_state = 0;
         gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
         xQueueSendToBack(queue, &pico_led_state, 0);
-        vTaskDelay(ms_delay);
+        vTaskDelay(ms_delay_led);
     }
 }
 
@@ -114,6 +142,8 @@ int main() {
     #ifdef DEBUG
     stdio_usb_init();
     #endif
+
+    multicore_launch_core1(core1_entry);
     
     // Set up two tasks
     // FROM 1.0.1 Store handles referencing the tasks; get return values
