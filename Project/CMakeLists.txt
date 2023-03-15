@@ -20,11 +20,15 @@ add_executable(${APP_NAME}
     ${APP_SRC_DIRECTORY}/main.c
 )
 
+target_include_directories(${APP_NAME} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Config)
+
 # Link to built libraries
 target_link_libraries(${APP_NAME} LINK_PUBLIC
     pico_multicore
-    pico_stdlib
-    FreeRTOS)
+    pico_stdlib 
+    FreeRTOS-Kernel FreeRTOS-Kernel-Heap3)
 
 target_link_options(${APP_NAME} PRIVATE
     -Xlinker --print-memory-usage

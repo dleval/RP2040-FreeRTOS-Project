@@ -2,6 +2,7 @@
 Raspberry pi pico RP2040 FreeRTOS Template Project
 
 Based on : https://github.com/smittytone/RP2040-FreeRTOS
+Based on : https://github.com/FreeRTOS/FreeRTOS-SMP-Demos
 
 ## Build Project
 ```
