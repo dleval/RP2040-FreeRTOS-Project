@@ -14,9 +14,6 @@ set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/Project")
 # FROM 1.3.0 -- Move common source code to a separate directory
 set(COMMON_CODE_DIRECTORY "${CMAKE_SOURCE_DIR}/Common")
 
-# Set app-side debugging "ON" or "OFF"
-set(DEBUG_MODE "ON")
-
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out the set() if you have a global copy of the
 # SDK set and $PICO_SDK_PATH defined in your $PATH

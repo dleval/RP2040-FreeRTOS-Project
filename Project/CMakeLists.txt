@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+# Set app-side debugging "ON" or "OFF"
+set(DEBUG_MODE "ON")
+
 # Should we set app-level debugging?
 # NOTE Equivalent of `#define DEBUG 1`
 if(${DEBUG_MODE})
@@ -15,10 +18,15 @@ add_compile_definitions(APP_NAME="${APP_NAME}")
 add_compile_definitions(APP_VERSION="${APP_VERSION_NUMBER}")
 add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
 
+# Include app header code file(s)
+include_directories(${APP_SRC_DIRECTORY}/inc)
+
 # Include app source code file(s)
+file(GLOB SOURCES src/*.c)
 add_executable(${APP_NAME}
-    ${APP_SRC_DIRECTORY}/main.c
+    ${SOURCES}
 )
+
 
 target_include_directories(${APP_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
